@@ -64,10 +64,10 @@
 // identical to crc32_checker.sv.
 // =============================================================================
 
-module crc32_checker
-#(parameter	FLIT_WIDTH    = 2048,
-  parameter	DIN_WD = FLIT_WIDTH - (14*8))  // Flit width less the FEC and CRC
-(
+module crc32_checker #(
+    parameter FLIT_WIDTH = 2048,
+    parameter DIN_WD     = FLIT_WIDTH - (14*8)  // Flit width less the FEC and CRC
+) (
     // Clock / reset
     input  logic          clk,
     input  logic          rst_n,       // async active-low reset
@@ -99,8 +99,6 @@ end : param_check
 // pragma translate_on
 
 localparam logic [31:0] CRC_POLY = 32'h741B8CD7;   // normal form of 0xBA0DC66B
-//localparam logic [31:0] CRC_INIT = 32'hFFFF_FFFF;  // pre-inversion
-//localparam logic [31:0] CRC_FXOR = 32'hFFFF_FFFF;  // post-inversion
 localparam logic [31:0] CRC_INIT = 32'h0000_0000;  // pre-inversion  (zero-CRC-on-zero-data behavior)
 localparam logic [31:0] CRC_FXOR = 32'h0000_0000;  // post-inversion (zero-CRC-on-zero-data behavior)
 
@@ -111,7 +109,7 @@ localparam logic [31:0] CRC_FXOR = 32'h0000_0000;  // post-inversion (zero-CRC-o
 //   Verification: coef[1023] = x^32 mod P(x) = 0x741B8CD7 = CRC_POLY  ✓
 // ---------------------------------------------------------------------------
 localparam logic [0:1023][31:0] parallel_crc_coef = {
-`include "CRC32_Koopman_table.sv"
+`include "crc32_koopman_table.sv"
 };
 
 // ---------------------------------------------------------------------------
@@ -229,30 +227,3 @@ assign crc_valid = r_crc_valid;
 assign crc_error = r_crc_error;
 
 endmodule
-// =============================================================================
-// End of crc32_checker_par.sv
-// =============================================================================
-
-/* Area report
-Number of cells:                        12858
-Number of combinational cells:          12822
-Number of sequential cells:                34
-
-
-Combinational area:               1200.576019
-Noncombinational area:               4.526496
-
-Total cell area:                  1205.102516
-*/
-
-/* Area report after compile ultra
-
-Number of cells:                        10675
-Number of combinational cells:          10635
-Number of sequential cells:                35
-
-Combinational area:                682.949296
-Noncombinational area:               4.753632
-
-Total cell area:                   687.702928
-*/
