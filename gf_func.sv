@@ -211,19 +211,19 @@ function automatic [3:0] gf4_inv (
         4'h0: return 4'h0;
         4'h1: return 4'h1;
         4'h2: return 4'h9;
-        4'h3: return 4'he;
         4'h4: return 4'hd;
-        4'h5: return 4'hb;
-        4'h6: return 4'h7;
-        4'h7: return 4'h6;
         4'h8: return 4'hf;
-        4'h9: return 4'h2;
-        4'ha: return 4'hc;
-        4'hb: return 4'h5;
+        4'h3: return 4'he;
+        4'h6: return 4'h7;
         4'hc: return 4'ha;
-        4'hd: return 4'h4;
+        4'hb: return 4'h5;
+        4'h5: return 4'hb;
+        4'ha: return 4'hc;
+        4'h7: return 4'h6;
         4'he: return 4'h3;
         4'hf: return 4'h8;
+        4'hd: return 4'h4;
+        4'h9: return 4'h2;
         default: return 4'hx;
     endcase
 endfunction
