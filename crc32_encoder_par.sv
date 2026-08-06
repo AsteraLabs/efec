@@ -119,8 +119,6 @@ localparam int PAD_START_OFFS = PAYLOAD_BYTES % BYTES_PER_WORD;  // never 0 for 
 
 // CRC-32 polynomial (Koopman 0xBA0DC66B → normal 0x741B8CD7)
 localparam logic [31:0] CRC_POLY  = 32'h741B8CD7;
-//localparam logic [31:0] CRC_INIT  = 32'hFFFF_FFFF;   // pre-inversion
-//localparam logic [31:0] CRC_FXOR  = 32'hFFFF_FFFF;   // post-inversion
 localparam logic [31:0] CRC_INIT  = 32'h0000_0000;   // pre-inversion  (zero-CRC-on-zero-data behavior)
 localparam logic [31:0] CRC_FXOR  = 32'h0000_0000;   // post-inversion (zero-CRC-on-zero-data behavior)
 
@@ -190,20 +188,6 @@ endfunction
 // ---------------------------------------------------------------------------
 always_comb begin : pad_mask_PROC
     s_data_padded = data_in;
-
-/* - last entry is masked out completely! remove since it's redundant already
-    if (r_word_cnt == CNT_WD'(PAD_WORD_IDX)) begin
-        // Mixed word: bytes 0..PAD_START_OFFS-1 are payload, rest are pad
-        for (int b = 0; b < BYTES_PER_WORD; b++) begin
-            if (b >= PAD_START_OFFS)
-                s_data_padded[(DATA_WIDTH - 1 - b * 8) -: 8] = 8'h00;
-        end
-    end else if (r_word_cnt > CNT_WD'(PAD_WORD_IDX)) begin
-        // Full pad word (only possible when WORDS_PER_FRAME > PAD_WORD_IDX+1)
-        s_data_padded = '0;
-    end
-    // else: full payload word – use data_in unchanged
-*/
 end : pad_mask_PROC
 
 // ---------------------------------------------------------------------------
@@ -252,8 +236,7 @@ always_ff @(posedge clk or negedge rst_n) begin : crc_accum_PROC
 end : crc_accum_PROC
 
 // ---------------------------------------------------------------------------
-// Output register  (1-cycle pipeline delay, mirroring x2_delay_n_w_stalling
-// with N=1 used on the flit path in the reference design)
+// Output register  (1-cycle pipeline delay)
 // ---------------------------------------------------------------------------
 always_ff @(posedge clk or negedge rst_n) begin : crc_out_PROC
     if (!rst_n) begin
@@ -275,19 +258,3 @@ assign crc_out   = r_crc_out;
 assign crc_valid = r_crc_valid;
 
 endmodule
-// =============================================================================
-// End of crc32_encoder_par.sv
-// =============================================================================
-
-/*
-area report
-Number of ports:                          295
-Number of nets:                          2279
-Number of cells:                         2017
-Number of combinational cells:           1952
-Number of sequential cells:                65
-
-Combinational area:                148.271139
-Noncombinational area:               8.436480
-Total cell area:                   156.707619
-*/
