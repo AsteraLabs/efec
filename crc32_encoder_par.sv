@@ -1,8 +1,32 @@
 // =============================================================================
-//	CONFIDENTIAL / PROPRIETARY
-//	This document contains confidential and proprietary information of Astera Labs.
-//	It is intended solely for the use of authorized personnel.
-//	Any unauthorized review, use, disclosure, or distribution is strictly prohibited.
+// SPDX-License-Identifier: BSD-3-Clause
+//
+// Copyright (c) 2025 Astera Labs, Inc.
+// All rights reserved.
+//
+// Redistribution and use in source and binary forms, with or without
+// modification, are permitted provided that the following conditions are met:
+//
+// 1. Redistributions of source code must retain the above copyright notice,
+//    this list of conditions and the following disclaimer.
+// 2. Redistributions in binary form must reproduce the above copyright notice,
+//    this list of conditions and the following disclaimer in the documentation
+//    and/or other materials provided with the distribution.
+// 3. Neither the name of Astera Labs, Inc. nor the names of its contributors
+//    may be used to endorse or promote products derived from this software
+//    without specific prior written permission.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+// AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+// IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+// ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+// LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+// SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+// INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+// CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+// ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
 //
 // crc32_encoder_par.sv
 //
@@ -97,17 +121,17 @@ localparam int PAD_START_OFFS = PAYLOAD_BYTES % BYTES_PER_WORD;  // never 0 for 
 localparam logic [31:0] CRC_POLY  = 32'h741B8CD7;
 //localparam logic [31:0] CRC_INIT  = 32'hFFFF_FFFF;   // pre-inversion
 //localparam logic [31:0] CRC_FXOR  = 32'hFFFF_FFFF;   // post-inversion
-localparam logic [31:0] CRC_INIT  = 32'h0000_0000;   // pre-inversion (Vlad modified from 0xFFFFFFFF, the customer wants zero CRC on zero data))
-localparam logic [31:0] CRC_FXOR  = 32'h0000_0000;   // post-inversion (Vlad modified from 0xFFFFFFFF, the customer wants zero CRC on zero data))
+localparam logic [31:0] CRC_INIT  = 32'h0000_0000;   // pre-inversion  (zero-CRC-on-zero-data behavior)
+localparam logic [31:0] CRC_FXOR  = 32'h0000_0000;   // post-inversion (zero-CRC-on-zero-data behavior)
 
 // ---------------------------------------------------------------------------
 // Parallel coefficient table
 //   1024 packed entries: coef[j] = x^(1024+31-j) mod P(x),  j = 0..1023
-//   Generated LSB-first by crc32_Koopman_table_gen.v (see crc32_Koopman_enc.sv).
+//   Generated LSB-first by crc32_koopman_table_gen.v (see crc32_Koopman_enc.sv).
 //   Verification: coef[1023] = x^32 mod P(x) = 0x741B8CD7 = CRC_POLY  ✓
 // ---------------------------------------------------------------------------
 localparam logic [0:1023][31:0] parallel_crc_coef = {
-`include "CRC32_Koopman_table.sv"
+`include "crc32_koopman_table.sv"
 };
 
 // ---------------------------------------------------------------------------
